@@ -1,6 +1,13 @@
+﻿"""
+Load World Countries data and prepare records for capital questions.
+
+Exclude records with missing, blank or multiple capitals.
+Currency and neighbouring-country preparation will be added later.
+"""
 import json
 from pathlib import Path
 
+# Locate the dataset relative to this Python file.
 data_path = Path(__file__).parent / "data" / "countries.json"
 
 try:
@@ -13,14 +20,15 @@ except FileNotFoundError:
 except json.JSONDecodeError:
     print("The file is not valid JSON. Download countries.json again.")
 
+  
 else:
-    quiz_countries = []
+    quiz_countries = [] # Store capital-question records separately from the original data.
 
     for country in countries:
         name = country.get("name", {}).get("common", "")
         capitals = country.get("capital", [])
 
-        if name and len(capitals) == 1 and capitals[0].strip():
+        if name and len(capitals) == 1 and capitals[0].strip():  # Require one usable capital to avoid ambiguous questions.
             quiz_country = {
                 "name": name,
                 "capital": capitals[0]
