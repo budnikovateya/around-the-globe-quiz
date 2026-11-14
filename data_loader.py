@@ -25,7 +25,7 @@ else:
     quiz_countries = [] # Store capital-question records separately from the original data.
 
     for country in countries:
-        name = country.get("name", {}).get("common", "")
+        name = country.get("name", {}).get("common", "").strip()
         capitals = country.get("capital", [])
 
         if name and len(capitals) == 1 and capitals[0].strip():  # Require one usable capital to avoid ambiguous questions.
@@ -42,3 +42,37 @@ else:
 
     for country in quiz_countries[:5]:
         print(country["name"], "-", country["capital"])
+
+
+        
+
+    # Prepare currencies separately: a country may qualify for one topic only.
+    currency_countries = []
+
+    for country in countries:
+        name = country.get("name", {}).get("common", "").strip()
+        currencies = country.get("currencies", {})
+
+        if name and len(currencies) == 1:  # Require exactly one currency to avoid multiple valid answers.
+            for code, details in currencies.items():
+                currency_name = details.get("name", "").strip()
+
+                if code.strip() and currency_name:
+                    currency_country = {
+                        "name": name,
+                        "currency_code": code.strip(),
+                        "currency_name": currency_name
+                    }
+
+                    currency_countries.append(currency_country)
+
+    print()
+    print("Countries with one usable currency:", len(currency_countries))
+
+    for country in currency_countries[:5]:
+        print(
+            country["name"],
+            "-",
+            country["currency_name"],
+            "(" + country["currency_code"] + ")"
+        )
