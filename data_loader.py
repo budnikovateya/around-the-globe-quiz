@@ -1,9 +1,16 @@
 ﻿"""
-Load World Countries data and prepare records for capital questions.
+Load World Countries data and prepare records for three quiz topics:
+capitals, currencies and neighbouring countries.
 
-Exclude records with missing, blank or multiple capitals.
-Currency and neighbouring-country preparation will be added later.
+Prepare each topic independently:
+- Capitals: keep records with a nonempty name and exactly one nonblank capital.
+- Currencies: keep records with a nonempty name and exactly one currency
+  with a usable name and code.
+- Neighbours: keep records with a nonempty name and at least one listed
+  land neighbour. Retain border codes for later conversion to country names.
 """
+
+
 import json
 from pathlib import Path
 
@@ -44,7 +51,7 @@ else:
         print(country["name"], "-", country["capital"])
 
 
-        
+
 
     # Prepare currencies separately: a country may qualify for one topic only.
     currency_countries = []
@@ -76,3 +83,42 @@ else:
             country["currency_name"],
             "(" + country["currency_code"] + ")"
         )
+
+
+
+       # Build a dictionary connecting country codes to readable names.
+    country_names = {}
+
+    for country in countries:
+        code = country.get("cca3", "").strip()
+        name = country.get("name", {}).get("common", "").strip()
+
+        if code and name:
+            country_names[code] = name
+
+    # Prepare records with at least one listed land neighbour.
+    neighboring_countries = []
+
+    for country in countries:
+        name = country.get("name", {}).get("common", "").strip()
+        borders = country.get("borders", [])
+
+        if name and len(borders) > 0:
+            neighbor_names = []
+
+            for border_code in borders:
+                neighbor_names.append(country_names[border_code])
+
+            neighboring_country = {
+                "name": name,
+                "borders": borders,
+                "neighbor_names": neighbor_names
+            }
+
+            neighboring_countries.append(neighboring_country)
+
+    print()
+    print("Countries with listed land neighbours:", len(neighboring_countries))
+
+    for country in neighboring_countries[:5]:
+        print(country["name"], "-", ", ".join(country["neighbor_names"]))
