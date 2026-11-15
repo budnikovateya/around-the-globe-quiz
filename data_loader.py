@@ -179,6 +179,8 @@ def prepare_neighbors(countries):
                 records.append({
                     "country_code": country_code,
                     "name": name,
+                    "region": country.get("region", "").strip(),
+                    "subregion": country.get("subregion", "").strip(),
                     "borders": borders.copy(),
                     "neighbor_names": neighbor_names
                 })
