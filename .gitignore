@@ -1,0 +1,15 @@
+# Project environment
+.venv/
+venv/
+
+# Automatically generated Python files
+__pycache__/
+*.pyc
+
+# Local editor and notebook files
+.vscode/
+.ipynb_checkpoints/
+
+# Local secrets
+.env
+.streamlit/secrets.toml
