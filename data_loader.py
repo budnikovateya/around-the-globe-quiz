@@ -91,20 +91,23 @@ def prepare_capitals(countries):
 
 def prepare_flags(countries, flags_folder):
     """
-    Select country records with an available local SVG flag.
+    Select UN-member countries with available, usable flag files.
 
     Parameters
     ----------
     countries : list of dict
         Original World Countries records.
     flags_folder : pathlib.Path
-        Folder containing flags named with lowercase country codes.
+        Folder containing SVG files named with lowercase country codes.
 
     Returns
     -------
     list of dict
         Records containing country_code, name, flag_path, region and subregion.
-        Records without a matching flag file are excluded.
+        Only records explicitly marked as UN members are included.
+        Indonesia, Monaco, Romania and Chad are excluded because their flags
+        form pairs that can be difficult to distinguish in a quiz image.
+        Records without a nonempty name, code or matching file are excluded.
 
     Raises
     ------
@@ -116,11 +119,18 @@ def prepare_flags(countries, flags_folder):
             "Cannot find the flag folder: " + str(flags_folder)
         )
 
+    ambiguous_flag_codes = ["IDN", "MCO", "ROU", "TCD"]
     records = []
 
     for country in countries:
+        if country.get("unMember", False) is not True:
+            continue
+
         name = country.get("name", {}).get("common", "").strip()
         country_code = country.get("cca3", "").strip()
+
+        if country_code in ambiguous_flag_codes:
+            continue
 
         if name and country_code:
             flag_path = flags_folder / (country_code.lower() + ".svg")
